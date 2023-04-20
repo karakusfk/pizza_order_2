@@ -1,0 +1,78 @@
+import csv
+
+# Define Pizza class with cost, description, and name
+class Pizza:
+    def __init__(self, cost, description, name):
+        self.cost = cost
+        self.description = description
+        self.name = name
+
+# Define available pizzas
+menu = [
+    Pizza(10, "Tomato sauce, mozzarella, and basil", "Margherita Pizza"),
+    Pizza(12, "Tomato sauce, mozzarella, mushrooms, and ham", "Classic Pizza"),
+    Pizza(15, "Tomato sauce, mozzarella, beef, onions, and peppers", "Beef Pizza"),
+    Pizza(18, "Tomato sauce, mozzarella, mushrooms, olives, and artichokes", "Mixed Pizza")
+]
+
+# Define available toppings
+toppings = [
+    "Mushrooms", "Onions", "Peppers", "Olives", "Artichokes", "Ham", "Beef", "Bacon"
+]
+
+# Function to display menu and get pizza choice
+def get_pizza_choice():
+    print("Menu:")
+    for i, pizza in enumerate(menu):
+        print(f"{i+1}. {pizza.name} - {pizza.description} - ${pizza.cost}")
+    while True:
+        try:
+            choice = int(input("Enter the number of the pizza you want to order: "))
+            if 1 <= choice <= len(menu):
+                return menu[choice-1]
+            else:
+                print("Invalid choice. Please enter a number from the menu.")
+        except ValueError:
+            print("Invalid choice. Please enter a number from the menu.")
+
+# Function to display toppings menu and get toppings choices
+def get_toppings_choices():
+    print("Toppings:")
+    for i, topping in enumerate(toppings):
+        print(f"{i+1}. {topping}")
+    print("Enter the number of the toppings you want to add to your pizza (separated by commas), or enter nothing to skip.")
+    while True:
+        try:
+            choices = input("Enter your choices: ")
+            if choices == "":
+                return []
+            choices = [int(c) for c in choices.split(",")]
+            if all(1 <= c <= len(toppings) for c in choices):
+                return [toppings[c-1] for c in choices]
+            else:
+                print("Invalid choice. Please enter a number from the toppings menu.")
+        except ValueError:
+            print("Invalid choice. Please enter a number from the toppings menu.")
+
+# Function to get payment info and save order to file
+def checkout(pizza, toppings):
+    total_cost = pizza.cost + len(toppings) * 1.5
+    print(f"Your order: {pizza.name} - {pizza.description}")
+    if toppings:
+        print("Toppings:", ", ".join(toppings))
+    print(f"Total cost: ${total_cost}")
+    print("Please enter your payment information:")
+    name = input("Name: ")
+    card_number = input("Card number: ")
+    with open("orders.csv", "a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([pizza.name, pizza.description, ", ".join(toppings), total_cost, name, card_number])
+    print("Thank you for your order!")
+
+# Main loop
+while True:
+    pizza = get_pizza_choice()
+    toppings = get_toppings_choices()
+    checkout(pizza, toppings)
+    if input("Do you want to order another pizza? (y/n) ").lower() != "y":
+        break
